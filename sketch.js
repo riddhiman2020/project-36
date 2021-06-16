@@ -4,7 +4,9 @@ const World = Matter.World;
 const Bodies = Matter.Bodies;
 const Body = Matter.Body;
 
-var foodStockVal
+var foodStockVal;
+var foodStock;
+var foodS;
 var dog,sadDog,happyDog;
 var feed_pet,add_food,foodObjt;
 
@@ -19,9 +21,12 @@ function setup() {
   createCanvas(1000,400);
   engine = Engine.create();
   world = engine.world;
-
+  foodStock=database.ref('Food');
+  foodStock.on("value",readStock);  
   
   food1=new Food();
+ 
+
   dog=createSprite(800,200,150,150);
   dog.addImage(sadDog);
   dog.scale=0.15;
@@ -42,34 +47,35 @@ function draw() {
   Engine.update(engine);
 
   food1.display();
+  
   drawSprites();
+}
+function readStock(data){
+  foodS=data.val();
+  food1.updateFoodStock(foodS);
 }
 
 //function to read food Stock
 function feedDog(){
   dog.addImage(happyDog)
   foodStockVal=food1.getFoodStock();
-  
   if(foodStockVal<=0){
     food1.updateFoodStock(foodStockVal*0)
   }else{
     food1.updateFoodStock(foodStockVal-1)
   }
-}
 
-//function to update food stock and last fed time
-//function update(){
-  //var FoodIndex = "Food/food1" + this.index;
-  //database.ref(FoodIndex).set({
-    //name:this.name,
-    //distance:this.distance
-  //});
-//}
-
-//function to add food in stock
-function addFood(){
-  foodStockVal++;
   database.ref('/').update({
-    food:foodStockVal
+    Food:foodStockVal
+    //FeedTime:hour()
+  })
+  
+}
+//function to add food in stock
+
+function addFood(){
+  foodS++;
+  database.ref('/').update({
+    Food:foodS
   })
 }
